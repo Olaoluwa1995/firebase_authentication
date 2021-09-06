@@ -55,19 +55,6 @@ class AuthServices with ChangeNotifier {
     notifyListeners();
   }
 
-  // Future verifyCode (String code) async {
-  //   try {
-  //     await firebaseAuth.verifyPasswordResetCode(code);
-  //     return true;   
-  //   } on SocketException {
-  //     setMessage('No internet, please connect to internet');
-  //   } catch (e) {
-  //     setMessage(e.toString());
-  //     return false;
-  //   }
-  //   notifyListeners();
-  // }
-
   Future confirmPasswordReset (String code, String newPassword) async {
     try {
       firebaseAuth.confirmPasswordReset(code: code, newPassword: newPassword);
