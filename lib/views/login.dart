@@ -1,13 +1,19 @@
 import 'package:firebase_authentication/config/size_config.dart';
 import 'package:firebase_authentication/constants/app_colors.dart';
+import 'package:firebase_authentication/constants/app_fonts.dart';
 import 'package:firebase_authentication/constants/widgets/custom_button.dart';
 import 'package:firebase_authentication/constants/widgets/custom_error_dialog.dart';
 import 'package:firebase_authentication/constants/widgets/custom_input.dart';
+import 'package:firebase_authentication/constants/widgets/loader.dart';
 import 'package:firebase_authentication/services/firebase_auth_services.dart';
+import 'package:firebase_authentication/views/home.dart';
+import 'package:firebase_authentication/views/register.dart';
+import 'package:firebase_authentication/views/reset_password.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
+  static const routeName = '/login';
   const Login({Key? key}) : super(key: key);
 
   @override
@@ -19,7 +25,6 @@ class _LoginState extends State<Login> {
   bool obsecurePassword = true;
 
   Map<String, dynamic> userData = {
-    // 'name': '',
     'email': '',
     'password': '',
   };
@@ -46,13 +51,6 @@ class _LoginState extends State<Login> {
     return null;
   }
 
-  // String? _nameValidator(value) {
-  //   if (value.isEmpty) {
-  //     return 'Please enter name';
-  //   }
-  //   return null;
-  // }
-
   void _showErrorDialog(String message) {
     showDialog(
       context: context,
@@ -65,14 +63,28 @@ class _LoginState extends State<Login> {
     );
   }
 
+  void _showloader() {
+    showDialog(
+      context: context,
+      builder: (ctx) => Loader(),
+    );
+  }
+
   Future<void>? _login() {
-    // if (!_loginFormKey.currentState!.validate()) {
-    //   // Invalid
-    //   return;
-    // }
-    _loginFormKey.currentState!.save();
-    AuthServices().login(userData['email'], userData['password'],);
-    print(AuthServices().errorMessage);
+    if (!_loginFormKey.currentState!.validate()) {
+      return null;
+    }
+     _loginFormKey.currentState!.save();
+    _showloader();
+    AuthServices().login(userData['email'], userData['password']).then((value) {
+    if(value) {
+      Navigator.pop(context, true);
+      Navigator.of(context).pushReplacementNamed(Home.routeName);
+    } else {
+        Navigator.pop(context);
+        _showErrorDialog('Something went wrong. Please try again!');
+    }
+    });
     return null;
 
   }
@@ -121,18 +133,6 @@ class _LoginState extends State<Login> {
                           SizedBox(
                             height: SizeConfig.heightMultiplier! * 3,
                           ),
-                        
-                          // CustomInput(
-                          //   hint: 'Dion',
-                          //   label: 'Last Name',
-                          //   onSaved: (value) {
-                          //     userData['lastName'] = value!;
-                          //   },
-                          //   validator: _nameValidator,
-                          // ),
-                          // SizedBox(
-                          //   height: SizeConfig.heightMultiplier! * 3,
-                          // ),
                           CustomInput(
                             hint: 'celine@gmail.com',
                             label: 'Email',
@@ -167,7 +167,11 @@ class _LoginState extends State<Login> {
                             ),
                             validator: _passwordValidator,
                           ),
-                         
+                          Align(
+                            alignment: Alignment.topRight,
+                            child: TextButton(
+                              onPressed: () => Navigator.of(context).pushReplacementNamed(ResetPassword.routeName), 
+                              child: Text('Forget Password?', style: AppFonts.link))),
                           SizedBox(
                             height: SizeConfig.heightMultiplier! * 5,
                           ),
@@ -175,9 +179,16 @@ class _LoginState extends State<Login> {
                               text: 'Login',
                               onpressed: _login,
                               width: size.width * 0.9),
-                          SizedBox(
-                            height: SizeConfig.heightMultiplier! * 5,
+                               SizedBox(
+                            height: SizeConfig.heightMultiplier!,
                           ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                            Text('Don\'t have an acount?', style: AppFonts.body1),
+                            TextButton(onPressed: () => Navigator.of(context).pushReplacementNamed(Register.routeName), child: Text('Register', style: AppFonts.link)),
+                          ],),
+                         
                         ],
                       ),
                     ),
