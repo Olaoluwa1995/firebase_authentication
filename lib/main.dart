@@ -67,9 +67,13 @@ class MyApp extends StatelessWidget {
             ),
           );
         } else {
-          Loader();
+          Container(
+            color: Colors.white,
+          );
         }
-        return Container();
+        return Container(
+            color: Colors.white,
+          );
         });
       });
     }); 
